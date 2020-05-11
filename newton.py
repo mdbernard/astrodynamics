@@ -8,10 +8,10 @@ def F_g(m1, r1, m2, r2):
 
     :param m1: `float` (kg) mass of body 1
     :param m2: `float` (kg) mass of body 2
-    :param r1: `array` ([m, m, m]) vector from origin to body 1
-    :param r2: `array` ([m, m, m]) vector from origin to body 2
+    :param r1: `1x3 array` (m) vector from origin to body 1
+    :param r2: `1x3 array` (m) vector from origin to body 2
 
-    :return: `array` ([N, N, N]) gravitational force exterted on body 2
+    :return: `1x3 array` (N) gravitational force exterted on body 2
     '''
     return -(G*m1*m2/(np.linalg.norm(r2-r1))**3)*(r2-r1)
 
@@ -25,10 +25,10 @@ def rdd(i, m_array, r_array):
     body i are gravitational.
 
     :param i: `int` (--) the index of the body to find acceleration of
-    :param m_array: `array` ([kg, kg, ...]) masses of all bodies
-    :param r_array: `array` ([m, m, ...]) positions of all bodies
+    :param m_array: `1xn array` (kg) masses of all bodies
+    :param r_array: `1xn array` (m) positions of all bodies
 
-    :return: `array` ([m/s**2, m/s**2, m/s**2]) vector acceleration of body i
+    :return: `1x3 array` (m/s**2) vector acceleration of body i
     '''
     mi = m_array[i]
     ri = r_array[i]
