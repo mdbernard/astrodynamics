@@ -21,6 +21,9 @@ def rdd(i, m_array, r_array):
     Computes the vector acceleration of body i given a list of body
     masses and positions. Assumes more than 1 body is given.
 
+    Assumes mass of body i is not changing, and all forces acting on
+    body i are gravitational.
+
     :param i: `int` (--) the index of the body to find acceleration of
     :param m_array: `array` ([kg, kg, ...]) masses of all bodies
     :param r_array: `array` ([m, m, ...]) positions of all bodies
