@@ -80,11 +80,19 @@ def E(r, rd):
 
 
 def h(r, rd):
+    '''
+    Returns the angular momentum vector of a satellite given
+    its position and velocity.
+    '''
     h = np.cross(r, rd)
     return h
 
 
 def flight_path_angle(r, rd):
+    '''
+    Returns the flight path angle in radians given the position
+    and velocity of a satellite.
+    '''
     ang_mom = np.linalg.norm(h(r, rd))
     if np.dot(r, rd) > 0:
         return abs(np.arccos(ang_mom/(np.linalg.norm(r)*np.linalg.norm(rd))))
