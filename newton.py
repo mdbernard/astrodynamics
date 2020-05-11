@@ -69,3 +69,24 @@ def rdd_rel(i, j, m_array, r_array):
         rdd_ij -= G*m*((rj-r)/np.linalg.norm(rj-r)**3 - (ri-r)/np.linalg.norm(ri-r)**3)
     
     return rdd_ij
+
+
+def E(r, rd):
+    '''
+    Compute the specific mechanical energy of a satellite given
+    its position and velocity relative to the orbited body.
+    '''
+    E = rd**2/2 - mu/r
+    return E.to('m**2/s**2')
+
+
+def h(r, rd):
+    h = np.cross(r, v)
+    return h
+
+
+def flight_path_angle(r, rd):
+    ang_mom = np.linalg.norm(h(r, rd))
+    if np.dot(r, v) > 0:
+        return abs(np.arccos(h/(np.linalg.norm(r)*np.linalg.norm(rd))))
+    return -abs(np.arccos(h/(np.linalg.norm(r)*np.linalg.norm(rd))))
