@@ -76,16 +76,16 @@ def E(r, rd):
     its position and velocity relative to the orbited body.
     '''
     E = rd**2/2 - mu_Earth/r
-    return E.to('m**2/s**2')
+    return E
 
 
 def h(r, rd):
-    h = np.cross(r, v)
+    h = np.cross(r, rd)
     return h
 
 
 def flight_path_angle(r, rd):
     ang_mom = np.linalg.norm(h(r, rd))
-    if np.dot(r, v) > 0:
-        return abs(np.arccos(h/(np.linalg.norm(r)*np.linalg.norm(rd))))
-    return -abs(np.arccos(h/(np.linalg.norm(r)*np.linalg.norm(rd))))
+    if np.dot(r, rd) > 0:
+        return abs(np.arccos(ang_mom/(np.linalg.norm(r)*np.linalg.norm(rd))))
+    return -abs(np.arccos(ang_mom/(np.linalg.norm(r)*np.linalg.norm(rd))))
