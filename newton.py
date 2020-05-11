@@ -40,3 +40,32 @@ def rdd(i, m_array, r_array):
         r -= (G*m/(np.linalg.norm(ri-r))**3)*(ri-r)
     
     return r
+
+
+def rdd_rel(i, j, m_array, r_array):
+    '''
+    Computes the relative acceleration vector of body j with respect
+    to body i. Assumes i and j are valid indices in m_array and r_array.
+
+    Assumes all bodies are point masses of constant magnitude. Assumes all
+    forces are gravitational between bodies.
+
+    :param i: `int` (--) index of body i in m_array and r_array
+    :param j: `int` (--) index of body j in m_array and r_array
+    :param m_array: `1x3 array` (kg) masses of all bodies
+    :param r_array: `1x3 array` (m) positions of all bodies relative to
+                    origin of inertial frame
+    
+    :return: `1x3 array` acceleration vector of body j relative to body i
+    '''
+    mi, mj = m_array[i], m_array[j]
+    ri, rj = r_array[i], r_array[j]
+
+    m_array = np.array([m_array[m] for m in range(len(m_array)) if m != i and m != j])    
+    r_array = np.array([r_array[r] for r in range(len(r_array)) if r != i and r != j])
+
+    rdd_ij = -G*(mi+mj)/(np.linalg.norm(rj-ri)**3)*(rj-ri)
+    for m, r in zip(m_array, r_array):
+        rdd_ij -= G*m*((rj-r)/np.linalg.norm(rj-r)**3 - (ri-r)/np.linalg.norm(ri-r)**3)
+    
+    return rdd_ij
