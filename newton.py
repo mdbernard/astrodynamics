@@ -1,6 +1,5 @@
-from thermostate import Q_
 import numpy as np
-from constants import G
+from constants import *
 
 def F_g(m1, r1, m2, r2):
     '''
@@ -76,7 +75,7 @@ def E(r, rd):
     Compute the specific mechanical energy of a satellite given
     its position and velocity relative to the orbited body.
     '''
-    E = rd**2/2 - mu/r
+    E = rd**2/2 - mu_Earth/r
     return E.to('m**2/s**2')
 
 
