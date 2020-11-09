@@ -130,11 +130,11 @@ def solve_kepler(r_0, v_0, dt, mu=398600, method='laguerre', tol=1e-7, max_iters
 
     if method not in VALID_METHODS:
         print(f'Method {method} is not valid, must be one of {VALID_METHODS}.\nDefaulting to laguerre method.')
-        chi, iters, converged = solve_kepler_laguerre(chi0, r0, vr0, mu, dt, alpha)
+        chi, _, _ = solve_kepler_laguerre(chi0, r0, vr0, mu, dt, alpha)
     elif method == 'newton':
-        chi, iters, converged = solve_kepler_newton(chi0, r0, vr0, mu, dt, alpha)
+        chi, _, _ = solve_kepler_newton(chi0, r0, vr0, mu, dt, alpha)
     else:  # method == 'laguerre'
-        chi, iters, converged = solve_kepler_laguerre(chi0, r0, vr0, mu, dt, alpha)
+        chi, _, _ = solve_kepler_laguerre(chi0, r0, vr0, mu, dt, alpha)
 
     f = calc_f(chi, r0, alpha)
     g = calc_g(dt, mu, chi, alpha)
@@ -157,7 +157,7 @@ def test():
     mu = 398600  # (km**3/s**2) gravitational parameter, Earth
     r_0 = np.array([20000, -105000, -19000])  # (km) initial position vector
     v_0 = np.array([0.9, -3.4, -1.5])  # (km/s) initial velocity vector
-    dt = 24*60*60  # (s) time of interest after initial time
+    dt = 2*60*60  # (s) time of interest after initial time
 
     # given correct answer from textbook
     correct_r_1 = np.array([26338, -128750, -29656])  # (km) final position vector
@@ -166,7 +166,6 @@ def test():
     # solve using above methods
     r_n, v_n = solve_kepler(r_0, v_0, dt, method='newton')
     r_l, v_l = solve_kepler(r_0, v_0, dt, method='laguerre')
-    print(r_l, r_n)
 
     # check correctness
     # tolerance based on significant figures of given answers
