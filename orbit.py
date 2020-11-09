@@ -1,7 +1,10 @@
 import numpy as np
 
 
-def calc_a()
+def calc_a(h, mu, e):
+    ''' Calculate semi-major axis given specific angular momentum,
+    gravitational parameter of primary body, and eccentricity. '''
+    return (h**2/mu)*(1/(1 - e**2))
 
 
 def calc_T(mu, a):
