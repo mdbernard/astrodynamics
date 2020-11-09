@@ -1,6 +1,9 @@
 import numpy as np
 
 
+def calc_a()
+
+
 def calc_T(mu, a):
     ''' Calculate orbital period given gravitational parameter
     and semi-major axis. '''
@@ -52,7 +55,7 @@ def find_orbital_elements(r_, v_, mu):
     N_ = np.cross(Khat_, h_)
     N = np.linalg.norm(N_)
 
-    RA = np.arccos(N_[2/N])
+    RA = np.arccos(N_[2]/N)
     RA = RA if N_[1] >= 0 else 2*np.pi - RA
 
     # Eccentricity
