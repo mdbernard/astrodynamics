@@ -5,14 +5,14 @@ class CelestialBody:
     def __init__(self, name, mass=None, radius=None, oblateness=None, J2=None):
         self.name = name
         self.mass = mass
-        self.radius = radius
+        self.radius_equatorial = radius
         self.oblateness = oblateness
         self.J2 = J2
 
         self.mu = G*self.mass
 
-        self.M = self.radius
-        self.R = self.mass
+        self.M = self.mass
+        self.R = self.radius_equatorial
 
 
 bodies = {
