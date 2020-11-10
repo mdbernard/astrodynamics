@@ -1,6 +1,6 @@
 import numpy as np
 from stumpff import C, S
-from CelestialBody import bodies
+from CelestialBody import BODIES
 from numerical import newton, laguerre
 from lagrange import calc_f, calc_fd, calc_g, calc_gd
 
@@ -107,7 +107,7 @@ def test():
     Orbital Mechanics for Engineering Students, 4 ed, Curtis.
     '''
     # given starting information
-    Earth = bodies['Earth']  # `CelestialBody` (--) Earth and all the Earth things
+    Earth = BODIES['Earth']  # `CelestialBody` (--) Earth and all the Earth things
     r_0 = np.array([20000, -105000, -19000])  # (km) initial position vector
     v_0 = np.array([0.9, -3.4, -1.5])  # (km/s) initial velocity vector
     dt = 2*60*60  # (s) time of interest after initial time

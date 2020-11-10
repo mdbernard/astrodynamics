@@ -1,4 +1,3 @@
-import numpy as np
 from constants import G
 
 
@@ -15,7 +14,7 @@ class CelestialBody:
         self.SOI = SOI  # `float` (km) radius of Sphere of Influence (SOI)
         self.rotational_rate = rotational_rate  # `float` (rad/s) rotational rate about axis
         self.primary = primary  # `str` (--) name of the body's primary (if it has one)
-        self.satellites = satellites  # `list` of `CelestialBody` (--) the bodies orbiting this body
+        self.satellites = satellites  # `list` of `CelestialBody` (--) the BODIES orbiting this body
 
         self.mu = G*self.mass  # `float` (km**3/s**2) gravitational parameter of the body
 
@@ -25,11 +24,11 @@ class CelestialBody:
         self.w = None
 
 
-''' Data for major celestial bodies in the Solar System. Data from 
+''' Data for major celestial BODIES in the Solar System. Data from 
 Orbital Mechanics for Engineering Students, 4 ed, Curtis. Includes
 data from Tables 4.3, A.1.
 '''
-bodies = {
+BODIES = {
     'Sun': CelestialBody('Sun', 1.989e30, 696e3),
     'Mercury': CelestialBody('Mercury', 330.0e21, 2440, 0.0, 60e-6, 112e3),
     'Venus': CelestialBody('Venus', 4.869e24, 6052, 0.0, 4.458e-6, 616e3),
@@ -44,9 +43,9 @@ bodies = {
 }
 
 # set primaries and satellites
-planets = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto']
-for planet in planets:
-    bodies[planet].primary = bodies['Sun']
-    bodies['Sun'].satellites.append(bodies[planet])
-bodies['Earth'].satellites.append(bodies['Moon'])
-bodies['Moon'].primary = bodies['Earth']
+PLANET_NAMES = ['Mercury', 'Venus', 'Earth', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto']
+for planet in PLANET_NAMES:
+    BODIES[planet].primary = BODIES['Sun']
+    BODIES['Sun'].satellites.append(BODIES[planet])
+BODIES['Earth'].satellites.append(BODIES['Moon'])
+BODIES['Moon'].primary = BODIES['Earth']
