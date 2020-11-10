@@ -1,7 +1,8 @@
 import numpy as np
-from lagrange import calc_f, calc_fd, calc_g, calc_gd
-from stumpff import C, S, dCdz, dSdz
+from stumpff import C, S
+from CelestialBody import bodies
 from numerical import newton, laguerre
+from lagrange import calc_f, calc_fd, calc_g, calc_gd
 
 
 def kepler_chi(chi, alpha, r0, vr0, mu, dt):
@@ -30,7 +31,7 @@ def d2kepler_dchi2(chi, alpha, r0, vr0, mu, dt):
            chi*(1 - z*S_)*(1 - alpha*r0)
 
 
-def solve_kepler_chi(r_0, v_0, dt, mu=398600, method='laguerre', tol=1e-7, max_iters=100):
+def solve_kepler_chi(r_0, v_0, dt, body, method='laguerre', tol=1e-7, max_iters=100):
     ''' Solve Kepler's Equation of the universal anomaly chi using the specified
     numerical method. Applies Algorithm 3.4 from Orbital Mechanics for Engineering
     Students, 4 ed, Curtis.
@@ -38,13 +39,15 @@ def solve_kepler_chi(r_0, v_0, dt, mu=398600, method='laguerre', tol=1e-7, max_i
     :param r_0: `iterable` (km) initial position 3-vector
     :param v_0: `iterable` (km/s) initial velocity 3-vector
     :param dt: `float` (s) time after initial state to sovle for r, v
-    :param mu: `float` (km**3/s**2) gravitational parameter, default Earth
+    :param body: `CelestialBody` (--) the celestial body to use for orbital parameters
     :param method: `str` (--) which numerical method to use to solve Kepler's Equation
     :param tol: `float` (--) decimal tolerance for numerical method (default 1e-7 is IEEE 745 single precision)
     :param max_iters: `int` (--) maximum number of iterations in numerical method before breaking
     :return: (km) final position 3-vector, (km/s) final velocity 3-vector
     '''
     VALID_METHODS = ('laguerre', 'newton')
+
+    mu = body.mu  # (km**3/s**2) gravitational parameter of the specified primary body
 
     r0 = np.linalg.norm(r_0)  # (km) initial position magnitude
     v0 = np.linalg.norm(v_0)  # (km/s) initial velocity magnitude
@@ -73,7 +76,7 @@ def solve_kepler_chi(r_0, v_0, dt, mu=398600, method='laguerre', tol=1e-7, max_i
     return r_1, v_1
 
 
-def solve_kepler_E(e, Me, with_oblateness=False, tol=1e-7, max_iters=100):
+def solve_kepler_E(e, Me, tol=1e-7, max_iters=100):
     ''' Solve Kepler's Equation in the form containing Eccentric Anomaly (E),
     eccentricity (e), and Mean Anomaly of Ellipse (Me). Uses Algorithm 3.1 from Orbital
     Mechanics for Engineering Students, 4 ed, Curtis. '''
@@ -104,7 +107,7 @@ def test():
     Orbital Mechanics for Engineering Students, 4 ed, Curtis.
     '''
     # given starting information
-    mu = 398600  # (km**3/s**2) gravitational parameter, Earth
+    Earth = bodies['Earth']  # `CelestialBody` (--) Earth and all the Earth things
     r_0 = np.array([20000, -105000, -19000])  # (km) initial position vector
     v_0 = np.array([0.9, -3.4, -1.5])  # (km/s) initial velocity vector
     dt = 2*60*60  # (s) time of interest after initial time
@@ -114,8 +117,8 @@ def test():
     correct_v_1 = np.array([0.86280, -3.2116, -1.4613])  # (km/s) final velocity vector
 
     # solve using above methods
-    r_n, v_n = solve_kepler(r_0, v_0, dt, method='newton')
-    r_l, v_l = solve_kepler(r_0, v_0, dt, method='laguerre')
+    r_n, v_n = solve_kepler_chi(r_0, v_0, dt, Earth, method='newton')
+    r_l, v_l = solve_kepler_chi(r_0, v_0, dt, Earth, method='laguerre')
 
     # check correctness
     # tolerance based on significant figures of given answers
