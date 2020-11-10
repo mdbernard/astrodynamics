@@ -26,8 +26,7 @@ class CelestialBody:
 
 ''' Data for major celestial BODIES in the Solar System. Data from 
 Orbital Mechanics for Engineering Students, 4 ed, Curtis. Includes
-data from Tables 4.3, A.1.
-'''
+data from Tables 4.3, A.1. '''
 BODIES = {
     'Sun': CelestialBody('Sun', 1.989e30, 696e3),
     'Mercury': CelestialBody('Mercury', 330.0e21, 2440, 0.0, 60e-6, 112e3),
