@@ -148,6 +148,31 @@ def solve_kepler(r_0, v_0, dt, mu=398600, method='laguerre', tol=1e-7, max_iters
     return r_1, v_1
 
 
+def solve_kepler_E(e, Me, tol=1e-7, max_iters=100):
+    ''' Solve Kepler's Equation in the form containing Eccentric Anomaly (E),
+    eccentricity (e), and Mean Anomaly of Ellipse (Me). Uses Algorithm 3.1 from Orbital
+    Mechanics for Engineering Students, 4 ed, Curtis. '''
+
+    def f(E, e, Me):
+        return E - e*np.sin(E) - Me
+
+    def fp(E, e):
+        return 1 - e*np.cos(E)
+
+    E = Me + e/2 if Me < np.pi else Me - e/2
+    ratio = f(E, e, Me)/fp(E, e)
+    iters = 0
+    while abs(ratio) > tol and iters < max_iters:
+        E -= ratio
+        ratio = f(E, e, Me)/fp(E, e)
+        iters += 1
+
+    E -= ratio
+    converged = np.abs(ratio) <= tol
+
+    return E, iters, converged
+
+
 def test():
     ''' Test the functionality of solve_kepler_newton 
     and solve_kepler_laguerre using Problem 3.20 from
