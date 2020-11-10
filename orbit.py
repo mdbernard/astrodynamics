@@ -13,6 +13,10 @@ def calc_T(mu, a):
     return 2*np.pi*a**1.5/np.sqrt(mu)
 
 
+def calc_RA(mu, J2, R, e, a):
+    return -1.5*(np.sqrt())
+
+
 def calc_RA_dot(mu, J2, R, e, a, i):
     ''' Calculate time rate of change of Right Ascension (RA)
     of an orbit given gravitational parameter, J2, equatorial
@@ -47,7 +51,7 @@ def find_orbital_elements(r_, v_, mu):
     vr = np.dot(r, v)/r
 
     # Specific Angular Momentum
-    h_ = np.cross(r, v)
+    h_ = np.cross(r_, v_)
     h = np.linalg.norm(h_)
 
     # Inclination
@@ -58,7 +62,7 @@ def find_orbital_elements(r_, v_, mu):
     N_ = np.cross(Khat_, h_)
     N = np.linalg.norm(N_)
 
-    RA = np.arccos(N_[2]/N)
+    RA = np.arccos(N_[0]/N)
     RA = RA if N_[1] >= 0 else 2*np.pi - RA
 
     # Eccentricity
@@ -73,4 +77,4 @@ def find_orbital_elements(r_, v_, mu):
     TA = np.arccos(np.dot(e_/e, r_/r))
     TA = TA if vr >= 0 else 2*np.pi - TA
 
-    return h, i, RA, e, AP, TA
+    return h, i, e, RA, AP, TA
