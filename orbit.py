@@ -13,10 +13,6 @@ def calc_T(mu, a):
     return 2*np.pi*a**1.5/np.sqrt(mu)
 
 
-def calc_RA(mu, J2, R, e, a):
-    return -1.5*(np.sqrt())
-
-
 def calc_RA_dot(mu, J2, R, e, a, i):
     ''' Calculate time rate of change of Right Ascension (RA)
     of an orbit given gravitational parameter, J2, equatorial
