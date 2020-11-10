@@ -1,114 +1,39 @@
 import numpy as np
 from lagrange import calc_f, calc_fd, calc_g, calc_gd
 from stumpff import C, S, dCdz, dSdz
+from numerical import newton, laguerre
 
 
-def f(chi_i, alpha, r_0, v_r_0, mu, dt):
-    z_i = alpha*chi_i**2
-    return (r_0*v_r_0/np.sqrt(mu))*chi_i**2*C(z_i) + \
-           (1 - alpha*r_0)*chi_i**3*S(z_i) + \
-           r_0*chi_i - np.sqrt(mu)*dt
+def kepler_chi(chi, alpha, r0, vr0, mu, dt):
+    ''' Kepler's Equation of the universal anomaly, modified
+    for use in numerical solvers. '''
+    z = alpha*chi**2
+    return (r0*vr0/np.sqrt(mu))*chi**2*C(z) + \
+           (1 - alpha*r0)*chi**3*S(z) + \
+           r0*chi - np.sqrt(mu)*dt
 
 
-def fp(chi_i, alpha, r_0, v_r_0, mu):
-    z_i = alpha*chi_i**2
-    return (r_0*v_r_0/np.sqrt(mu))*chi_i*(1 - alpha*chi_i**2*S(z_i)) + \
-           (1 - alpha*r_0)*chi_i**2*C(z_i) + r_0
+def dkepler_dchi(chi, alpha, r0, vr0, mu, dt):
+    ''' Derivative of Kepler's Equation of the universal anomaly,
+    modified for use in numerical solvers. '''
+    z = alpha*chi**2
+    return (r0*vr0/np.sqrt(mu))*chi*(1 - alpha*chi**2*S(z)) + \
+           (1 - alpha*r0)*chi**2*C(z) + r0
 
 
-def fpp(chi, alpha, r_0, v_r_0, mu):
+def d2kepler_dchi2(chi, alpha, r0, vr0, mu, dt):
+    ''' Second derivative of Kepler's Equation of the universal
+    anomaly, modified for use in numerical solvers. '''
     z = alpha*chi**2
     S_ = S(z)
-    return (r_0*v_r_0/np.sqrt(mu))*(1 - 3*z*S_ + z*(C(z) - 3*S_)) +  \
-           chi*(1 - z*S_)*(1 - alpha*r_0)
+    return (r0*vr0/np.sqrt(mu))*(1 - 3*z*S_ + z*(C(z) - 3*S_)) + \
+           chi*(1 - z*S_)*(1 - alpha*r0)
 
 
-def solve_kepler_newton(chi_0, r_0, v_r_0, mu, dt, alpha, tol=1e-7, max_iters=100):
-    ''' Iteratively solve Kepler's Equation using Newton's method, assuming
-    a two-body problem.
-
-    $$\Chi_{i+1} = \Chi_{i} - f(\alpha \Chi_i^2)/f'(\alpha \Chi_i^2)$$
-
-    :param chi_0: (rad) initial estimate for Chi
-    :param r_0: (km) initial position magnitude
-    :param v_r_0: (km/s) initial radial velocity magnitude
-    :param mu: (km**3/s**2) gravitational parameter of primary body
-    :param dt: (s) delta time from initial conditions at which to find Chi
-    :param alpha: (1/km) inverse of semi-major axis of orbit
-    :param tol: (--) decimal precision of returned Chi (1e-7 is IEEE 754 single precision)
-    :param max_iters: (--) maximum number of iterations to attempt without convergence
-
-    :return: (rad) Chi at dt sections after initial conditions
-    '''
-    chi_i = chi_0
-    iters = 0
-    ratio = f(chi_i, alpha, r_0, v_r_0, mu, dt) / \
-            fp(chi_i, alpha, r_0, v_r_0, mu)
-    
-    while np.abs(ratio) > tol and iters < max_iters:
-        chi_i -= ratio
-        ratio = f(chi_i, alpha, r_0, v_r_0, mu, dt) / \
-                fp(chi_i, alpha, r_0, v_r_0, mu)
-        iters += 1
-
-    chi_i -= ratio
-    converged = np.abs(ratio) <= tol
-
-    return chi_i, iters, converged
-
-
-def solve_kepler_laguerre(chi_0, r_0, v_r_0, mu, dt, alpha, n=5, tol=1e-7, max_iters=100):
-    ''' Iteratively solve Kepler's Equation using Laguerres's method, assuming
-    a two-body problem.
-
-    $$\Chi_{i+1} = \Chi_{i} - f(\alpha \Chi_i^2)/f'(\alpha \Chi_i^2)$$
-
-    :ref: "An Improved Algorithm Due to Laguerre for the Solution of Kepler's Equation", Conway (1985)
-
-    :param chi_0: (rad) initial estimate for Chi
-    :param n: (--) degree of "polynomial" (see reference, default 5)
-    :param r_0: (km) initial position magnitude
-    :param v_r_0: (km/s) initial radial velocity magnitude
-    :param mu: (km**3/s**2) gravitational parameter of primary body
-    :param dt: (s) delta time from initial conditions at which to find Chi
-    :param alpha: (1/km) inverse of semi-major axis of orbit
-    :param tol: (--) decimal precision of returned Chi (1e-7 is IEEE 754 single precision)
-    :param max_iters: (--) maximum number of iterations to attempt without convergence
-
-    :return: (rad) Chi at dt sections after initial conditions
-    '''
-    chi_i = chi_0
-    iters = 0
-
-    f_ = f(chi_i, alpha, r_0, v_r_0, mu, dt)
-    fp_ = fp(chi_i, alpha, r_0, v_r_0, mu)
-    fpp_ = fpp(chi_i, alpha, r_0, v_r_0, mu)
-    num = n*f_
-    rad = np.sqrt(np.abs((n - 1)**2*fp_**2 - n*(n - 1)*f_*fpp_))
-    den = np.amax([fp_ + rad, fp_ - rad])
-    ratio = num/den
-
-    while np.abs(ratio) > tol and iters < max_iters:
-        chi_i -= ratio
-        f_ = f(chi_i, alpha, r_0, v_r_0, mu, dt)
-        fp_ = fp(chi_i, alpha, r_0, v_r_0, mu)
-        fpp_ = fpp(chi_i, alpha, r_0, v_r_0, mu)
-        num = n*f_
-        rad = np.sqrt(np.abs((n - 1)**2*fp_**2 - n*(n - 1)*f_*fpp_))
-        den = np.amax([fp_ + rad, fp_ - rad])
-        ratio = num/den
-        iters += 1
-
-    chi_i -= ratio
-    converged = np.abs(ratio) <= tol
-
-    return chi_i, iters, converged
-
-
-def solve_kepler(r_0, v_0, dt, mu=398600, method='laguerre', tol=1e-7, max_iters=100):
-    ''' Wrapper for either solve_kepler_newton or solve_kepler_laguerre,
-    whicever is specified. Applies Algorithm 3.4 from Orbital Mechanics for
-    Engineering Students, 4 ed, Curtis.
+def solve_kepler_chi(r_0, v_0, dt, mu=398600, method='laguerre', tol=1e-7, max_iters=100):
+    ''' Solve Kepler's Equation of the universal anomaly chi using the specified
+    numerical method. Applies Algorithm 3.4 from Orbital Mechanics for Engineering
+    Students, 4 ed, Curtis.
 
     :param r_0: `iterable` (km) initial position 3-vector
     :param v_0: `iterable` (km/s) initial velocity 3-vector
@@ -130,11 +55,11 @@ def solve_kepler(r_0, v_0, dt, mu=398600, method='laguerre', tol=1e-7, max_iters
 
     if method not in VALID_METHODS:
         print(f'Method {method} is not valid, must be one of {VALID_METHODS}.\nDefaulting to laguerre method.')
-        chi, _, _ = solve_kepler_laguerre(chi0, r0, vr0, mu, dt, alpha)
+        chi, _, _ = laguerre(chi0, kepler_chi, dkepler_dchi, d2kepler_dchi2, alpha, r0, vr0, mu, dt)
     elif method == 'newton':
-        chi, _, _ = solve_kepler_newton(chi0, r0, vr0, mu, dt, alpha)
+        chi, _, _ = newton(chi0, kepler_chi, dkepler_dchi, alpha, r0, vr0, mu, dt)
     else:  # method == 'laguerre'
-        chi, _, _ = solve_kepler_laguerre(chi0, r0, vr0, mu, dt, alpha)
+        chi, _, _ = laguerre(chi0, kepler_chi, dkepler_dchi, d2kepler_dchi2, alpha, r0, vr0, mu, dt)
 
     f = calc_f(chi, r0, alpha)
     g = calc_g(dt, mu, chi, alpha)
@@ -148,7 +73,7 @@ def solve_kepler(r_0, v_0, dt, mu=398600, method='laguerre', tol=1e-7, max_iters
     return r_1, v_1
 
 
-def solve_kepler_E(e, Me, tol=1e-7, max_iters=100):
+def solve_kepler_E(e, Me, with_oblateness=False, tol=1e-7, max_iters=100):
     ''' Solve Kepler's Equation in the form containing Eccentric Anomaly (E),
     eccentricity (e), and Mean Anomaly of Ellipse (Me). Uses Algorithm 3.1 from Orbital
     Mechanics for Engineering Students, 4 ed, Curtis. '''
