@@ -31,7 +31,7 @@ def d2kepler_dchi2(chi, alpha, r0, vr0, mu, dt):
            chi*(1 - z*S_)*(1 - alpha*r0)
 
 
-def solve_kepler_chi(r_0, v_0, dt, body, method='laguerre', tol=1e-7, max_iters=100):
+def solve_kepler_chi(r_0, v_0, dt, body=BODIES['Earth'], method='laguerre', tol=1e-7, max_iters=100):
     ''' Solve Kepler's Equation of the universal anomaly chi using the specified
     numerical method. Applies Algorithm 3.4 from Orbital Mechanics for Engineering
     Students, 4 ed, Curtis.
