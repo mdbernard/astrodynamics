@@ -81,6 +81,8 @@ def solve_kepler_E(e, Me, tol=1e-7, max_iters=100):
     eccentricity (e), and Mean Anomaly of Ellipse (Me). Uses Algorithm 3.1 from Orbital
     Mechanics for Engineering Students, 4 ed, Curtis. '''
 
+    # TODO: have this function make use of one of the numerical methods in numerical.py
+
     def f(E, e, Me):
         return E - e*np.sin(E) - Me
 
