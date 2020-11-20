@@ -1,6 +1,11 @@
 import numpy as np
 
 
+def calc_v(mu, r, a):
+    # TODO: add docstring
+    return np.sqrt(2*(mu/r - mu/2/a))  # (km/s)
+
+
 def calc_a(h, mu, e):
     ''' Calculate semi-major axis given specific angular momentum,
     gravitational parameter of primary body, and eccentricity. '''
@@ -74,3 +79,28 @@ def find_orbital_elements(r_, v_, mu):
     TA = TA if vr >= 0 else 2*np.pi - TA
 
     return h, i, e, RA, AP, TA
+
+
+def calc_dv_hohmann_coplanar_common_apseline(mu, ra1, rp1, ra2, rp2):
+    ''' Calculate total delta-V (m/s) required for a Hohmann transfer between
+    two coplanar orbits with a common apse line.
+    :param mu: `float` (km**3/s**2) gravitational parameter of primary body
+    :param ra1: `float` (km) apoapsis radius, initial orbit
+    :param rp1: `float` (km) periapsis radius, initial orbit
+    :param ra2: `float` (km) apoapsis radius, final orbit
+    :param rp2: `float` (km) periapsis radius, final orbit
+    :return: `float` (m/s) total delta-V required for maneuver
+    '''
+    a1 = 0.5*(ra1 + rp1)
+    ai = 0.5*(ra2 + rp1)
+    a2 = 0.5*(ra2 + rp2)
+
+    vp1 = calc_v(mu, rp1, a1)
+    vpi = calc_v(mu, rp1, ai)
+    vai = calc_v(mu, ra2, ai)
+    va2 = calc_v(mu, ra2, a2)
+
+    dv1 = vpi - vp1  # (km/s) delta-V of first burn
+    dv2 = va2 - vai  # (km/s) delta-V of second burn
+
+    return (np.abs(dv1) + np.abs(dv2))*10**3  # (m/s) total maneuver delta-V
