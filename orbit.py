@@ -63,20 +63,34 @@ def find_orbital_elements(r_, v_, mu):
     N_ = np.cross(Khat_, h_)
     N = np.linalg.norm(N_)
 
-    RA = np.arccos(N_[0]/N)
-    RA = RA if N_[1] >= 0 else 2*np.pi - RA
+    if N != 0:
+        RA = np.arccos(N_[0]/N)
+        RA = RA if N_[1] >= 0 else 2*np.pi - RA
+    else:
+        RA = 0.0
 
     # Eccentricity
     e_ = (1/mu)*(np.cross(v_, h_) - mu*r_/r)
     e = np.linalg.norm(e_)
 
     # Argument of Periapsis
-    AP = np.arccos(np.dot(N_/N, e_/e))
-    AP = AP if e_[2] >= 0 else 2*np.pi - AP
+    if N != 0:
+        if e > 1e-7:
+            AP = np.arccos(np.dot(N_/N, e_/e))
+            AP = AP if e_[2] >= 0 else 2*np.pi - AP        
+        else:
+            AP = 0.0
+    else:
+        AP = 0.0
 
     # True Anomaly
-    TA = np.arccos(np.dot(e_/e, r_/r))
-    TA = TA if vr >= 0 else 2*np.pi - TA
+    if e > 1e-7:
+        TA = np.arccos(np.dot(e_/e, r_/r))
+        TA = TA if vr >= 0 else 2*np.pi - TA
+    else:
+        cp = np.cross(N_, r_)
+        TA = np.arccos(np.dot(N_, r_)/N/r)
+        TA = TA if cp[2] >= 0 else 2*np.pi - TA
 
     return h, i, e, RA, AP, TA
 
