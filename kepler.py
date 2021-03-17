@@ -38,7 +38,7 @@ def solve_kepler_chi(r_0, v_0, dt, body=BODIES['Earth'], method='laguerre', tol=
 
     :param r_0: `iterable` (km) initial position 3-vector
     :param v_0: `iterable` (km/s) initial velocity 3-vector
-    :param dt: `float` (s) time after initial state to sovle for r, v
+    :param dt: `float` (s) time after initial state to solve for r, v as 3-vectors
     :param body: `CelestialBody` (--) the celestial body to use for orbital parameters
     :param method: `str` (--) which numerical method to use to solve Kepler's Equation
     :param tol: `float` (--) decimal tolerance for numerical method (default 1e-7 is IEEE 745 single precision)
@@ -57,7 +57,7 @@ def solve_kepler_chi(r_0, v_0, dt, body=BODIES['Earth'], method='laguerre', tol=
     chi0 = np.sqrt(mu)*np.abs(alpha)*dt
 
     if method not in VALID_METHODS:
-        print(f'Method {method} is not valid, must be one of {VALID_METHODS}.\nDefaulting to laguerre method.')
+        print(f'Method \'{method}\' is not valid, must be one of {VALID_METHODS}.\nDefaulting to laguerre method.')
         chi, _, _ = laguerre(chi0, kepler_chi, dkepler_dchi, d2kepler_dchi2, alpha, r0, vr0, mu, dt)
     elif method == 'newton':
         chi, _, _ = newton(chi0, kepler_chi, dkepler_dchi, alpha, r0, vr0, mu, dt)
@@ -104,7 +104,7 @@ def solve_kepler_E(e, Me, tol=1e-7, max_iters=100):
 
 
 def test():
-    ''' Test the functionality of solve_kepler_newton 
+    ''' Test the functionality of solve_kepler_chi 
     and solve_kepler_laguerre using Problem 3.20 from
     Orbital Mechanics for Engineering Students, 4 ed, Curtis.
     '''
