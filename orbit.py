@@ -1,6 +1,13 @@
 import numpy as np
 
 
+def calc_v(mu, r, a):
+    ''' Calculate velocity at a point in an orbit given
+    the gravitational parameter of the primary body, radius
+    at the point of interest, and the semi-major axis of
+    the orbit. '''
+    return np.sqrt(2*(mu/r - mu/2/a))
+
 def calc_a(h, mu, e):
     ''' Calculate semi-major axis given specific angular momentum,
     gravitational parameter of primary body, and eccentricity. '''
@@ -58,19 +65,70 @@ def find_orbital_elements(r_, v_, mu):
     N_ = np.cross(Khat_, h_)
     N = np.linalg.norm(N_)
 
-    RA = np.arccos(N_[0]/N)
-    RA = RA if N_[1] >= 0 else 2*np.pi - RA
+    if N != 0:
+        RA = np.arccos(N_[0]/N)
+        RA = RA if N_[1] >= 0 else 2*np.pi - RA
+    else:
+        RA = 0.0
 
     # Eccentricity
     e_ = (1/mu)*(np.cross(v_, h_) - mu*r_/r)
     e = np.linalg.norm(e_)
 
     # Argument of Periapsis
-    AP = np.arccos(np.dot(N_/N, e_/e))
-    AP = AP if e_[2] >= 0 else 2*np.pi - AP
+    if N != 0:
+        if e > 1e-7:
+            AP = np.arccos(np.dot(N_/N, e_/e))
+            AP = AP if e_[2] >= 0 else 2*np.pi - AP        
+        else:
+            AP = 0.0
+    else:
+        AP = 0.0
 
     # True Anomaly
-    TA = np.arccos(np.dot(e_/e, r_/r))
-    TA = TA if vr >= 0 else 2*np.pi - TA
+    if e > 1e-7:
+        TA = np.arccos(np.dot(e_/e, r_/r))
+        TA = TA if vr >= 0 else 2*np.pi - TA
+    else:
+        cp = np.cross(N_, r_)
+        TA = np.arccos(np.dot(N_, r_)/N/r)
+        TA = TA if cp[2] >= 0 else 2*np.pi - TA
 
     return h, i, e, RA, AP, TA
+
+
+def calc_v_infinity(mu, R1, R2):
+    ''' Calculate the hyperbolic excess speed for an escape trajectory
+    from planet 1 with circular orbit radius R1 about the primary with
+    gravitational parameter mu headed toward planet 2 with radius R2
+    about the primary.
+    :param R1: `float` (km) circular orbital radius, planet 1
+    :param R2: `float` (km) circular orbital radius, planet 2
+    :return: `float` (km/s) hyperbolic excess speed of escape trajectory
+    '''
+    return np.sqrt((mu/R1)*(np.sqrt((2*R2)/(R1 + R2)) - 1))
+
+
+def calc_dv_hohmann_common_apseline(mu, ra1, rp1, ra2, rp2):
+    ''' Calculate total delta-V (m/s) required for a Hohmann transfer between
+    two coplanar orbits with a common apse line.
+    :param mu: `float` (km**3/s**2) gravitational parameter of primary body
+    :param ra1: `float` (km) apoapsis radius, initial orbit
+    :param rp1: `float` (km) periapsis radius, initial orbit
+    :param ra2: `float` (km) apoapsis radius, final orbit
+    :param rp2: `float` (km) periapsis radius, final orbit
+    :return: `float` (m/s) total delta-V required for maneuver
+    '''
+    a1 = 0.5*(ra1 + rp1)
+    ai = 0.5*(ra2 + rp1)
+    a2 = 0.5*(ra2 + rp2)
+
+    vp1 = calc_v(mu, rp1, a1)
+    vpi = calc_v(mu, rp1, ai)
+    vai = calc_v(mu, ra2, ai)
+    va2 = calc_v(mu, ra2, a2)
+
+    dv1 = vpi - vp1  # (km/s) delta-V of first burn
+    dv2 = va2 - vai  # (km/s) delta-V of second burn
+
+    return (np.abs(dv1) + np.abs(dv2))  # (km/s) total maneuver delta-V
