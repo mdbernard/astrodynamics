@@ -6,7 +6,8 @@ def calc_v(mu, r, a):
     the gravitational parameter of the primary body, radius
     at the point of interest, and the semi-major axis of
     the orbit. '''
-    return np.sqrt(2*(mu/r - mu/2/a))
+    return np.sqrt(2*(mu/r - mu/2/a))  # (km/s)
+
 
 def calc_a(h, mu, e):
     ''' Calculate semi-major axis given specific angular momentum,
@@ -109,7 +110,7 @@ def calc_v_infinity(mu, R1, R2):
     return np.sqrt((mu/R1)*(np.sqrt((2*R2)/(R1 + R2)) - 1))
 
 
-def calc_dv_hohmann_common_apseline(mu, ra1, rp1, ra2, rp2):
+def calc_dv_hohmann_coplanar_common_apseline(mu, ra1, rp1, ra2, rp2):
     ''' Calculate total delta-V (m/s) required for a Hohmann transfer between
     two coplanar orbits with a common apse line.
     :param mu: `float` (km**3/s**2) gravitational parameter of primary body
