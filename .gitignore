@@ -1,7 +1,4 @@
-HW/*
-P_*.py
 .idea/*
-__pycache__/*
 */__pycache__/*
 *.zip
 .DS_Store
