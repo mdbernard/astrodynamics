@@ -1,13 +1,13 @@
-from typing import Optional
+"""Implementation of Euler Angles."""
 
 import numpy as np
 
-import attitude.parameter.base
-from attitude.parameter.constants import PI, SINGULARITY_EPS
-import attitude.parameter.direction_cosine_matrix
+import attitude.parameter.base as base
+import attitude.parameter.constants as constants
+import attitude.parameter.direction_cosine_matrix as direction_cosine_matrix
 
 
-class BaseEulerAngle(attitude.parameter.base.BaseAttitudeParameter):
+class BaseEulerAngle(base.BaseAttitudeParameter):
     """
     Base class for Euler Angle parameterizations.
     All angles are handled in radians by default except in
@@ -34,7 +34,7 @@ class BaseEulerAngle(attitude.parameter.base.BaseAttitudeParameter):
 
     @classmethod
     def from_dcm(
-        cls, dcm: attitude.parameter.direction_cosine_matrix.DCM
+        cls, dcm: "direction_cosine_matrix.DCM"
     ) -> "BaseEulerAngle":
         """Initialize the Euler Angles instance from a DCM."""
         raise NotImplementedError("Derived classes should define this method")
@@ -77,7 +77,10 @@ class BaseSymmetricEulerAngle(BaseEulerAngle):
         Symmetric Euler Angles are singular when the second angle
         is 0 or pi radians.
         """
-        return abs(self.a2) < SINGULARITY_EPS or abs(self.a2 - PI) < SINGULARITY_EPS
+        return (
+            abs(self.a2) < constants.SINGULARITY_EPS
+            or abs(self.a2 - constants.PI) < constants.SINGULARITY_EPS
+        )
 
 
 class BaseAsymmetricEulerAngle(BaseEulerAngle):
@@ -87,7 +90,7 @@ class BaseAsymmetricEulerAngle(BaseEulerAngle):
         Asymmetric Euler Angles are singular when the second angle
         is +/- pi/2 radians.
         """
-        return abs(abs(self.a2) - PI/2) < SINGULARITY_EPS
+        return abs(abs(self.a2) - constants.PI/2) < constants.SINGULARITY_EPS
 
 
 class EulerAngle321(BaseAsymmetricEulerAngle):
@@ -115,7 +118,7 @@ class EulerAngle321(BaseAsymmetricEulerAngle):
 
     @classmethod
     def from_dcm(
-        cls, dcm: attitude.parameter.direction_cosine_matrix.DCM
+        cls, dcm: "direction_cosine_matrix.DCM"
     ) -> "EulerAngle321":
         C = dcm.array
         a1 = np.arctan2(C[0,1], C[0,0])
@@ -128,7 +131,7 @@ class EulerAngle313(BaseSymmetricEulerAngle):
     """3-1-3 Euler Angle (yaw, roll, yaw)."""
 
     def from_dcm(
-        cls, dcm: attitude.parameter.direction_cosine_matrix.DCM
+        cls, dcm: "direction_cosine_matrix.DCM"
     ) -> "EulerAngle313":
         C = dcm.array
         a1 = np.arctan2(C[2,0], -C[2,1])

@@ -4,11 +4,11 @@ from typing import Optional
 
 import numpy as np
 
-import attitude.parameter.base
-import attitude.parameter.euler_angle
+import attitude.parameter.base as base
+import attitude.parameter.euler_angle as euler_angle
 
 
-class DCM(attitude.parameter.base):
+class DCM(base.BaseAttitudeParameter):
     """Direction Cosine Matrix (DCM)."""
     def __init__(
         self, array_3x3: Optional[float] = None) -> None:
@@ -23,7 +23,7 @@ class DCM(attitude.parameter.base):
 
     @classmethod
     def from_321_euler_angles(
-        cls, ea_321: attitude.parameter.euler_angle.EulerAngle321
+        cls, ea_321: "euler_angle.EulerAngle321"
     ) -> None:
         """
         Initialize the DCM from a 3-2-1 set of Euler
@@ -52,7 +52,7 @@ class DCM(attitude.parameter.base):
 
     @classmethod
     def from_313_euler_angles(
-        cls, ea_313: attitude.parameter.euler_angle.EulerAngle313
+        cls, ea_313: "euler_angle.EulerAngle313"
     ) -> "DCM":
         """
         Initialize the DCM from a 3-1-3 set of Euler
